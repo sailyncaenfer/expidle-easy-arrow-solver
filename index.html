@@ -228,7 +228,7 @@
         for (let j = 0; j < 3; j++) {
           result[i][j] %= 4;
           const cell = outputGrid.children[i * 3 + j];
-          cell.textContent = result[i][j];
+          cell.textContent = result[i][j] === 0 ? "" : result[i][j];
           cell.style.color = "white";
           cell.style.backgroundColor = result[i][j] === 0 ? "#000" : colorMap[result[i][j]];
         }
