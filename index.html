@@ -6,8 +6,6 @@
   <style>
     * {
       user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -20,7 +18,7 @@
     }
 
     body {
-      background-color: #333333;
+      background-color: #333;
       font-family: "Computer Modern Serif", serif;
       color: white;
       display: flex;
@@ -28,15 +26,12 @@
       align-items: center;
       justify-content: flex-start;
       transform: translateY(2%);
-      position: relative;
-      overscroll-behavior: none;
-      -webkit-overflow-scrolling: auto;
       touch-action: none;
     }
 
     h1 {
       font-size: 28px;
-      margin: 12px 0 6px 0;
+      margin: 10px 0;
     }
 
     .label {
@@ -46,23 +41,22 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, 72px);
-      grid-gap: 0px 0px;
+      grid-template-columns: repeat(3, var(--cell-size, 72px));
+      gap: 0px;
     }
 
     .cell, .reset-button {
-      width: 72px;
-      height: 72px;
+      width: var(--cell-size, 72px);
+      height: var(--cell-size, 72px);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       border: 0.7px solid #666;
-      font-size: 19px;
+      font-size: var(--font-size, 19px);
+      color: white;
       transition: background-color 0.2s ease, color 0.2s ease;
       -webkit-tap-highlight-color: transparent;
-      tap-highlight-color: transparent;
-      color: white;
     }
 
     .cell {
@@ -78,8 +72,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      margin-top: 6px;
+      gap: 6px;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
 
     .inputWrapper {
@@ -89,27 +89,42 @@
 
     .reset-button {
       position: absolute;
-      top: -20px;
-      right: -20px;
-      width: 28px;
-      height: 28px;
+      top: -16px;
+      right: -16px;
+      width: 26px;
+      height: 26px;
       background-color: #000;
-      font-size: 16px;
+      font-size: 14px;
       border-radius: 50%;
       border: 0.7px solid #666;
       cursor: pointer;
       padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .reset-button:hover {
-      background-color: #111;
-    }
+    @media (orientation: landscape) {
+      :root {
+        --cell-size: 50px;
+        --font-size: 16px;
+      }
 
-    button:focus {
-      outline: none;
+      h1 {
+        font-size: 20px;
+      }
+
+      .wrapper {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .reset-button {
+        top: -14px;
+        right: -14px;
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -117,17 +132,19 @@
 
   <h1>Arrow Puzzle Solver</h1>
 
-  <div class="section">
-    <div class="label">Board State</div>
-    <div class="inputWrapper">
-      <div class="grid" id="inputGrid"></div>
-      <button class="reset-button" onclick="resetInput()">↺</button>
+  <div class="wrapper">
+    <div class="section">
+      <div class="label">Board State</div>
+      <div class="inputWrapper">
+        <div class="grid" id="inputGrid"></div>
+        <button class="reset-button" onclick="resetInput()">↺</button>
+      </div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="label">Solution</div>
-    <div class="grid" id="outputGrid"></div>
+    <div class="section">
+      <div class="label">Solution</div>
+      <div class="grid" id="outputGrid"></div>
+    </div>
   </div>
 
   <script>
