@@ -17,6 +17,11 @@
       overflow: hidden;
     }
 
+    :root {
+      --cell-size: min(calc(12vw + 8px), 100px);
+      --font-size: min(calc(3.5vw + 1px), 24px);
+    }
+
     body {
       background-color: #333;
       font-family: "Computer Modern Serif", serif;
@@ -41,19 +46,19 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, var(--cell-size, 72px));
+      grid-template-columns: repeat(3, var(--cell-size));
       gap: 0px;
     }
 
     .cell, .reset-button {
-      width: var(--cell-size, 72px);
-      height: var(--cell-size, 72px);
+      width: var(--cell-size);
+      height: var(--cell-size);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       border: 0.7px solid #666;
-      font-size: var(--font-size, 19px);
+      font-size: var(--font-size);
       color: white;
       transition: background-color 0.2s ease, color 0.2s ease;
       -webkit-tap-highlight-color: transparent;
@@ -101,12 +106,31 @@
       padding: 0;
     }
 
-    @media (orientation: landscape) {
+    @media (orientation: portrait) {
       :root {
-        --cell-size: 50px;
-        --font-size: 16px;
+        --cell-size: min(calc(18vw), 80px);
+        --font-size: min(calc(4vw), 20px);
       }
 
+      h1 {
+        font-size: 24px;
+      }
+
+      .wrapper {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .reset-button {
+        top: -16px;
+        right: -16px;
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+      }
+    }
+
+    @media (orientation: landscape) {
       h1 {
         font-size: 20px;
       }
