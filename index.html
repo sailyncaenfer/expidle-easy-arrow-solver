@@ -17,11 +17,6 @@
       overflow: hidden;
     }
 
-    :root {
-      --cell-size: min(calc(12vw + 8px), 100px);
-      --font-size: min(calc(3.5vw + 1px), 24px);
-    }
-
     body {
       background-color: #333;
       font-family: "Computer Modern Serif", serif;
@@ -35,19 +30,19 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 2.6vh;
       margin: 10px 0;
     }
 
     .label {
-      font-size: 18px;
+      font-size: 1.8vh;
       margin-bottom: 4px;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(3, var(--cell-size));
-      gap: 0px;
+      gap: 0;
     }
 
     .cell, .reset-button {
@@ -84,7 +79,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 2vh;
     }
 
     .inputWrapper {
@@ -106,172 +101,158 @@
       padding: 0;
     }
 
-    @media (orientation: portrait) {
-      :root {
-        --cell-size: min(calc(18vw), 80px);
-        --font-size: min(calc(4vw), 20px);
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .wrapper {
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .reset-button {
-        top: -16px;
-        right: -16px;
-        width: 26px;
-        height: 26px;
-        font-size: 14px;
-      }
-    }
-
     @media (orientation: landscape) {
-      h1 {
-        font-size: 20px;
-      }
-
       .wrapper {
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        gap: 30px;
-      }
-
-      .reset-button {
-        top: -14px;
-        right: -14px;
-        width: 22px;
-        height: 22px;
-        font-size: 12px;
+        gap: 4vh;
       }
     }
   </style>
 </head>
 <body>
 
-  <h1>Arrow Puzzle Solver</h1>
+<h1>Arrow Puzzle Solver</h1>
 
-  <div class="wrapper">
-    <div class="section">
-      <div class="label">Board State</div>
-      <div class="inputWrapper">
-        <div class="grid" id="inputGrid"></div>
-        <button class="reset-button" onclick="resetInput()">↺</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="label">Solution</div>
-      <div class="grid" id="outputGrid"></div>
+<div class="wrapper">
+  <div class="section">
+    <div class="label">Board State</div>
+    <div class="inputWrapper">
+      <div class="grid" id="inputGrid"></div>
+      <button class="reset-button" onclick="resetInput()">↺</button>
     </div>
   </div>
 
-  <script>
-    const inputGrid = document.getElementById('inputGrid');
-    const outputGrid = document.getElementById('outputGrid');
+  <div class="section">
+    <div class="label">Solution</div>
+    <div class="grid" id="outputGrid"></div>
+  </div>
+</div>
 
-    const colorMap = {
-      1: "#111111",
-      2: "#272727",
-      3: "#3E3E3E",
-      4: "#555555"
-    };
+<script>
+  const inputGrid = document.getElementById('inputGrid');
+  const outputGrid = document.getElementById('outputGrid');
 
-    const movesets = [
-      [[0,0,0],[0,1,3],[0,3,1]],
-      [[0,0,0],[1,3,1],[3,1,3]],
-      [[0,0,0],[3,1,0],[1,3,0]],
-      [[0,1,3],[0,3,1],[0,1,3]],
-      [[1,3,1],[3,1,3],[1,3,1]],
-      [[3,1,0],[1,3,0],[3,1,0]],
-      [[0,3,1],[0,1,3],[0,0,0]],
-      [[3,1,3],[1,3,1],[0,0,0]],
-      [[1,3,0],[3,1,0],[0,0,0]]
-    ];
+  const colorMap = {
+    1: "#111111",
+    2: "#272727",
+    3: "#3E3E3E",
+    4: "#555555"
+  };
 
-    const iterations = [0,0,3,2,1];
+  const movesets = [
+    [[0,0,0],[0,1,3],[0,3,1]],
+    [[0,0,0],[1,3,1],[3,1,3]],
+    [[0,0,0],[3,1,0],[1,3,0]],
+    [[0,1,3],[0,3,1],[0,1,3]],
+    [[1,3,1],[3,1,3],[1,3,1]],
+    [[3,1,0],[1,3,0],[3,1,0]],
+    [[0,3,1],[0,1,3],[0,0,0]],
+    [[3,1,3],[1,3,1],[0,0,0]],
+    [[1,3,0],[3,1,0],[0,0,0]]
+  ];
 
-    const inputValues = Array(3).fill().map(() => Array(3).fill(1));
-    const outputValues = Array(3).fill().map(() => Array(3).fill(0));
+  const iterations = [0,0,3,2,1];
+  const inputValues = Array(3).fill().map(() => Array(3).fill(1));
+  const outputValues = Array(3).fill().map(() => Array(3).fill(0));
 
-    function createGrids() {
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          cell.dataset.row = i;
-          cell.dataset.col = j;
-          inputGrid.appendChild(cell);
-          cell.addEventListener('pointerdown', () => {
-            inputValues[i][j] = inputValues[i][j] % 4 + 1;
-            updateInputGrid();
-            updateOutputGrid();
-          });
+  function resizeCells() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const isLandscape = w > h;
 
-          const outputCell = document.createElement('div');
-          outputCell.className = 'cell output-cell';
-          outputGrid.appendChild(outputCell);
-        }
+    let size, fontSize;
+    if (isLandscape) {
+      size = Math.floor(h * 0.22);
+    } else {
+      size = Math.floor(w * 0.22);
+    }
+    fontSize = Math.floor(size * 0.26);
+
+    document.documentElement.style.setProperty('--cell-size', size + 'px');
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+  }
+
+  function createGrids() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        inputGrid.appendChild(cell);
+        cell.addEventListener('pointerdown', () => {
+          inputValues[i][j] = inputValues[i][j] % 4 + 1;
+          updateInputGrid();
+          updateOutputGrid();
+        });
+
+        const outputCell = document.createElement('div');
+        outputCell.className = 'cell output-cell';
+        outputGrid.appendChild(outputCell);
       }
     }
+  }
 
-    function updateInputGrid() {
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          const v = inputValues[i][j];
-          const c = inputGrid.children[i * 3 + j];
-          c.textContent = v;
-          c.style.backgroundColor = colorMap[v];
-        }
+  function updateInputGrid() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const v = inputValues[i][j];
+        const c = inputGrid.children[i * 3 + j];
+        c.textContent = v;
+        c.style.backgroundColor = colorMap[v];
       }
     }
+  }
 
-    function updateOutputGrid() {
-      const result = Array(3).fill().map(() => Array(3).fill(0));
-
-      for (let row = 0; row < 3; row++) {
-        for (let col = 0; col < 3; col++) {
-          const times = iterations[inputValues[row][col]];
-          const move = movesets[row * 3 + col];
-          for (let t = 0; t < times; t++) {
-            for (let i = 0; i < 3; i++) {
-              for (let j = 0; j < 3; j++) {
-                result[i][j] += move[i][j];
-              }
+  function updateOutputGrid() {
+    const result = Array(3).fill().map(() => Array(3).fill(0));
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        const times = iterations[inputValues[row][col]];
+        const move = movesets[row * 3 + col];
+        for (let t = 0; t < times; t++) {
+          for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+              result[i][j] += move[i][j];
             }
           }
         }
       }
-
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          result[i][j] %= 4;
-          const cell = outputGrid.children[i * 3 + j];
-          cell.textContent = result[i][j] === 0 ? "" : result[i][j];
-          cell.style.color = "white";
-          cell.style.backgroundColor = result[i][j] === 0 ? "#000" : colorMap[result[i][j]];
-        }
-      }
     }
 
-    function resetInput() {
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          inputValues[i][j] = 1;
-        }
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        result[i][j] %= 4;
+        const cell = outputGrid.children[i * 3 + j];
+        cell.textContent = result[i][j] === 0 ? '' : result[i][j];
+        cell.style.color = "white";
+        cell.style.backgroundColor = result[i][j] === 0 ? "#000" : colorMap[result[i][j]];
       }
-      updateInputGrid();
-      updateOutputGrid();
     }
+  }
 
-    createGrids();
+  function resetInput() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        inputValues[i][j] = 1;
+      }
+    }
     updateInputGrid();
     updateOutputGrid();
-  </script>
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCells();
+    updateInputGrid();
+    updateOutputGrid();
+  });
+
+  resizeCells();
+  createGrids();
+  updateInputGrid();
+  updateOutputGrid();
+</script>
 </body>
 </html>
